@@ -41,11 +41,13 @@ INSTALLED_APPS = [
     'taggit',
     'rest_framework',
     'rest_framework.authtoken',
-    'django_filters',
-
-    # 'allauth',
-    # 'allauth.account',
-    # 'allauth.socialaccount',
+    'django_filters','dj_rest_auth',
+    'rest_framework_simplejwt'
+,   'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'dj_rest_auth.registration',
+    'allauth.socialaccount.providers.google',
 ]
 SITE_ID = 1
 
@@ -176,6 +178,11 @@ REST_FRAMEWORK = {
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 10,

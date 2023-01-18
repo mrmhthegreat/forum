@@ -36,6 +36,10 @@ class PostManger(models.Manager):
 
     def search(self,query,user=None,active=False):
         return self.get_querry().search(query,user=user,active=active)
+class PostVoter(models.Model):
+    author = models.ForeignKey(User,blank=False,null=False, on_delete = models.CASCADE)
+
+
 class Post(models.Model):
     objects=PostManger()
     question = models.CharField(max_length = 200)
@@ -45,6 +49,7 @@ class Post(models.Model):
     image = models.ImageField( upload_to='post',null=False,blank=False)
     tag = TaggableManager()
     author = models.ForeignKey(User,related_name='author',null=False,blank=False, on_delete = models.CASCADE)
+    voter=models.ManyToManyField(PostVoter,null=True,blank=True)
     upvote=models.PositiveIntegerField(default=0)
     downvote=models.PositiveIntegerField(default=0)
     total_answer=models.PositiveIntegerField(default=0)
@@ -71,6 +76,7 @@ class Answer(models.Model):
     date_posted = models.DateTimeField(auto_now_add=True)
     upvote=models.PositiveIntegerField(default=0)
     downvote=models.PositiveIntegerField(default=0)
+    voter=models.ManyToManyField(PostVoter,null=True,blank=True)
     total_reply=models.PositiveIntegerField(default=0)
     is_anonymous = models.BooleanField(default=False)
     pin_answer = models.BooleanField(default=False)
@@ -86,6 +92,8 @@ class Answer_Reply(models.Model):
     upvote=models.PositiveIntegerField(default=0)
     downvote=models.PositiveIntegerField(default=0)
     date_posted = models.DateTimeField(default=timezone.now)
+    voter=models.ManyToManyField(PostVoter,null=True,blank=True)
+
     class Meta:
         ordering = ['-date_posted']
     def __str__(self):

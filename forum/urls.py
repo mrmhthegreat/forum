@@ -3,19 +3,24 @@ from django.contrib import admin
 from django.urls import path,include
 from django.conf import settings
 from django.conf.urls.static import static
-from django.contrib.auth import views as auth_views
-from.api import UserSerializer,UserViewSet
-from rest_framework import routers
-from rest_framework.authtoken.views import obtain_auth_token
-
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+    TokenVerifyView
+)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('ckeditor/',include('ckeditor_uploader.urls')),
     path('api-auth/', include('rest_framework.urls')),
     path('api/v1/postdata/',include('ask.urls')),
     path('api/v1/noticedata/',include('notice.urls')),
-    path('api/v1/faqdata/',include('faq.urls'))
-
+    path('api/v1/faqdata/',include('faq.urls')),
+    path('api/v1/userdata/',include('user.urls')),
+    path('api/v1/rest-auth/', include('dj_rest_auth.urls')),
+    path('api/v1/rest-auth/registration/', include('dj_rest_auth.registration.urls')),
+    path('api/v1/user/api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/v1/user/api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/v1/user/api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
         
 ]+static(settings.STATIC_URL,document_root=settings.STATIC_ROOT)
 urlpatterns+= static(settings.MEDIA_URL,document_root = settings.MEDIA_ROOT)

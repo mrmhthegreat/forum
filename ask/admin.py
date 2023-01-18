@@ -1,8 +1,9 @@
 from django.contrib import admin
-from .models import Post,Answer,Answer_Reply,Topic
+from .models import Post,Answer,Answer_Reply,Topic,PostVoter
 
 
 admin.site.register(Answer_Reply)
+admin.site.register(PostVoter)
 @admin.register(Post)
 class post_admin(admin.ModelAdmin):
     list_display=['slug','is_active','upvote','downvote']

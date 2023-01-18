@@ -12,20 +12,24 @@ class TopicSerialzer(serializers.Serializer):
     topic=serializers.CharField(read_only=True)
     id=serializers.IntegerField(read_only=True)
     
-
+class VoteSerialzer(serializers.Serializer):
+    username=serializers.CharField(read_only=True)
 class AnswereplySerialzer(serializers.ModelSerializer):
     author=UserSerializer()
+    voter=VoteSerialzer(many=True)
     class Meta:
         model=Answer_Reply
-        fields=['author','upvote','downvote','date_posted','reply']
+        fields=['id','author','upvote','downvote','date_posted','reply','voter']
         
 
 class AnswerSerialzer(serializers.ModelSerializer):
     author=UserSerializer()
     reply=AnswereplySerialzer(many=True)
+    voter=VoteSerialzer(many=True)
+
     class Meta:
         model=Answer
-        fields=['author','answer','reply','upvote','downvote','date_posted','total_reply','is_anonymous','pin_answer']
+        fields=['id','author','answer','reply','upvote','downvote','date_posted','total_reply','is_anonymous','pin_answer','voter']
 
 class PostSelizer(serializers.ModelSerializer):
     url=serializers.HyperlinkedIdentityField(view_name='post_detail',lookup_field='slug')
@@ -33,6 +37,7 @@ class PostSelizer(serializers.ModelSerializer):
     tag=TagSerialzer()
     topics=TopicSerialzer(many=True)
     post_answer= AnswerSerialzer(many=True)
+    voter=VoteSerialzer(many=True)
 
     # getmy-d(sle,d):
     # re {
@@ -43,31 +48,25 @@ class PostSelizer(serializers.ModelSerializer):
     author=UserSerializer()
     class Meta:
         model=Post
-        fields=['url','editurl','question','topics','content','image','tag','author','upvote','downvote','total_answer','is_active','is_anonymous','date_posted','post_answer']
+        fields=['id','url','editurl','question','topics','content','image','tag','author','upvote','downvote','total_answer','is_active','is_anonymous','date_posted','post_answer','voter']
+
+
+
 
 
         
-class PostCreateSelizer(serializers.ModelSerializer):
-    class Meta:
-        model=Post
 
-        fields=['question','topics','content','image','upvote','downvote','total_answer','is_active','is_anonymous','date_posted']
-
-class PostUpdateSelizer(serializers.ModelSerializer):
-    class Meta:
-        model=Post
-
-        fields=['question','topics','content','image','is_active',]
 
 
 class PostDetailSelizer(serializers.ModelSerializer):
     
     tag=TagSerialzer()
     topics=TopicSerialzer(many=True)
+    voter=VoteSerialzer(many=True)
     
     class Meta:
         model=Post
-        fields=['question','topics','content','image','tag','author','upvote','downvote','total_answer','is_active','is_anonymous','date_posted']
+        fields=['id','question','topics','content','image','tag','author','upvote','downvote','total_answer','is_active','is_anonymous','date_posted','voter']
      
     # def get_discount(self,obj):
     #     return ''
@@ -88,3 +87,45 @@ class PostDetailSelizer(serializers.ModelSerializer):
     # look_dats
     # lok[]=self.re.from django.conf import settingsqs=supper().get(ar,kw)
     # ret tq.f(**loa)
+class PostCreateSelizer(serializers.ModelSerializer):
+    class Meta:
+        model=Post
+
+        fields=['question','topics','content','image','is_active','is_anonymous']
+
+class PostUpdateSelizer(serializers.ModelSerializer):
+    class Meta:
+        model=Post
+        fields=['question','topics','content','image','is_active',]
+
+
+
+class PostCountSelizer(serializers.ModelSerializer):
+    post=serializers.IntegerField(write_only=True)
+    class Meta:
+        model=Post
+        fields=['post','upvote','downvote','total_answer','is_active']
+class AnswerCountSelizer(serializers.ModelSerializer):
+    answer=serializers.IntegerField(write_only=True)
+
+    class Meta:
+        model=Answer
+        fields=['upvote','downvote','total_reply','pin_answer','id']
+class AnswerRCountSelizer(serializers.ModelSerializer):
+    answer=serializers.IntegerField(write_only=True)
+    
+    class Meta:
+        model=Answer_Reply
+        fields=['upvote','downvote','id']
+
+class AnswetCreateSelizer(serializers.ModelSerializer):
+    post=serializers.IntegerField(write_only=True)
+    class Meta:
+        model=Answer
+
+        fields=['answer','is_anonymous','post']
+class AnsweReplyCreatSelizer(serializers.ModelSerializer):
+    anser=serializers.IntegerField(write_only=True)
+    class Meta:
+        model=Answer_Reply
+        fields=['reply','anser']
