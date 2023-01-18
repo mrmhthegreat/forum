@@ -22,7 +22,7 @@ class FilterFaqList(generics.ListAPIView):
     filter_backends = [filters.SearchFilter,DjangoFilterBackend,filters.OrderingFilter]
     filterset_fields = ['topic__topic']
     search_fields = ['title', 'topic__topic']
-    ordering_fields = ['date_posted',]
+    ordering_fields = ['date_posted']
 class FaqDetail(generics.RetrieveAPIView):
     serializer_class=FaqSerlizer
     queryset=FAQ.objects.all()
