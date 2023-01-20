@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
-from .models import *
-from user.serlizer import UserSerializer
+from .models import Notice
+from authentication.serializers import UserSerializer
 
 
 
@@ -14,7 +14,7 @@ class NoticesSerlizer(serializers.ModelSerializer):
         fields=['url','title','content','author','image','date_posted']
 
 
-class PostCreateSelizer(serializers.ModelSerializer):
+class NoticeCreateSelizer(serializers.ModelSerializer):
     class Meta:
         model=Notice
         fields=['title','content','image']

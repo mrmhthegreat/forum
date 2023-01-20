@@ -8,6 +8,24 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
     TokenVerifyView
 )
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+from rest_framework import permissions
+
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title="Forum API",
+        default_version='v1',
+        description="Test description",
+        terms_of_service="https://www.ourapp.com/policies/terms/",
+        contact=openapi.Contact(email="contact@expenses.local"),
+        license=openapi.License(name="Test License"),
+        
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
+)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('ckeditor/',include('ckeditor_uploader.urls')),
@@ -15,13 +33,17 @@ urlpatterns = [
     path('api/v1/postdata/',include('ask.urls')),
     path('api/v1/noticedata/',include('notice.urls')),
     path('api/v1/faqdata/',include('faq.urls')),
-    path('api/v1/userdata/',include('user.urls')),
-    path('api/v1/rest-auth/', include('dj_rest_auth.urls')),
-    path('api/v1/rest-auth/registration/', include('dj_rest_auth.registration.urls')),
-    path('api/v1/user/api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/v1/user/api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('api/v1/user/api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
-        
+  
+    path('auth/', include('authentication.urls')),
+    path('social_auth/', include(('social_auth.urls', 'social_auth'),
+                                 namespace="social_auth")),
+                                  path('', schema_view.with_ui('swagger',
+                                 cache_timeout=0), name='schema-swagger-ui'),
+
+    path('api/api.json/', schema_view.without_ui(cache_timeout=0),
+         name='schema-swagger-ui'),
+    path('redoc/', schema_view.with_ui('redoc',
+                                       cache_timeout=0), name='schema-redoc'),
 ]+static(settings.STATIC_URL,document_root=settings.STATIC_ROOT)
 urlpatterns+= static(settings.MEDIA_URL,document_root = settings.MEDIA_ROOT)
 

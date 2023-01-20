@@ -1,5 +1,5 @@
 from django.urls import  include,path
-from .api import AllFaqList,FilterFaqList,FaqDetail
+from .views import AllFaqList,FilterFaqList,FaqDetail
 urlpatterns =[
     path('allfaq/',AllFaqList.as_view(),name='faq_list'),
     path('faqserach/',FilterFaqList.as_view(),name='faq_search'),

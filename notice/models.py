@@ -1,10 +1,11 @@
 from django.db import models
 from django.utils import timezone
-from django.contrib.auth.models import User
+from authentication.models import User
+
 from ckeditor_uploader.fields import RichTextUploadingField
 from django.urls import reverse
 from django.utils.text import slugify
-from django.db.models.signals import pre_save,post_save
+from django.db.models.signals import pre_save
 # Create your models here.
 
 class Notice(models.Model):

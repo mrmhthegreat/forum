@@ -1,8 +1,7 @@
 from rest_framework import serializers
 
 from .models import *
-from user.serlizer import UserSerializer
-
+from authentication.serializers import UserSerializer
 
 class TagSerialzer(serializers.Serializer):
     name=serializers.CharField(read_only=True)
@@ -34,11 +33,12 @@ class AnswerSerialzer(serializers.ModelSerializer):
 class PostSelizer(serializers.ModelSerializer):
     url=serializers.HyperlinkedIdentityField(view_name='post_detail',lookup_field='slug')
     editurl=serializers.HyperlinkedIdentityField(view_name='post_update',lookup_field='slug')
+    answer_url=serializers.SerializerMethodField(read_only=True)
     tag=TagSerialzer()
     topics=TopicSerialzer(many=True)
-    post_answer= AnswerSerialzer(many=True)
     voter=VoteSerialzer(many=True)
-
+    def get_answer_url(self,obj):
+        return 'http://127.0.0.1:8000'+'/api/v1/postdata/post/answerlist/'+f"?slug={obj.slug}"
     # getmy-d(sle,d):
     # re {
     #     'objs'
@@ -48,7 +48,7 @@ class PostSelizer(serializers.ModelSerializer):
     author=UserSerializer()
     class Meta:
         model=Post
-        fields=['id','url','editurl','question','topics','content','image','tag','author','upvote','downvote','total_answer','is_active','is_anonymous','date_posted','post_answer','voter']
+        fields=['id','url','editurl','answer_url','question','topics','content','image','tag','author','upvote','downvote','total_answer','is_active','is_anonymous','date_posted','voter']
 
 
 
@@ -106,14 +106,12 @@ class PostCountSelizer(serializers.ModelSerializer):
         model=Post
         fields=['post','upvote','downvote','total_answer','is_active']
 class AnswerCountSelizer(serializers.ModelSerializer):
-    answer=serializers.IntegerField(write_only=True)
-
+    id=serializers.IntegerField(write_only=True)
     class Meta:
         model=Answer
         fields=['upvote','downvote','total_reply','pin_answer','id']
 class AnswerRCountSelizer(serializers.ModelSerializer):
-    answer=serializers.IntegerField(write_only=True)
-    
+    id=serializers.IntegerField(write_only=True)
     class Meta:
         model=Answer_Reply
         fields=['upvote','downvote','id']

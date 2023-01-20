@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.conf.urls.static import static
 from django.conf import settings
 from django.views.generic import CreateView
-from .api import AllNoticeList,NoticeCreate,NoticeDetail
+from .views import AllNoticeList,NoticeCreate,NoticeDetail
 urlpatterns =[
     path('allnotice/',AllNoticeList.as_view(),name='notice_list'),
     path('noticecreate/',NoticeCreate.as_view(),name='notice_create'),

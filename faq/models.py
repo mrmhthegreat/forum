@@ -2,7 +2,6 @@ from django.db import models
 from ckeditor_uploader.fields import RichTextUploadingField
 from django.db import models
 from ckeditor_uploader.fields import RichTextUploadingField
-from django.urls import reverse
 from django.utils.text import slugify
 from django.utils import timezone
 
@@ -19,7 +18,7 @@ class FAQ(models.Model):
     content = RichTextUploadingField(blank=True,null=False, config_name='special')
     tag = models.CharField(max_length = 200)
     slug=models.SlugField(blank=True,null=True,unique=True)
-    topic=models.ManyToManyField(FaqTopic, blank=False)
+    topic=models.ManyToManyField(FaqTopic,related_name='faqtopic', blank=False)
     date_posted = models.DateTimeField(default=timezone.now)
     class Meta:
         ordering = ['-date_posted']
