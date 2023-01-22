@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from rest_framework import generics, status, views, permissions
+from rest_framework import generics, status,views, permissions,viewsets
+from rest_framework.decorators import action
 from .serializers import RegisterSerializer, SetNewPasswordSerializer, ResetPasswordEmailRequestSerializer, EmailVerificationSerializer, LoginSerializer, LogoutSerializer, UserUpdateSerializer
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -8,6 +9,8 @@ from .utils import Util
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 import jwt
+from .utils import send_otp,verfiy_otp
+
 from django.conf import settings
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
@@ -26,7 +29,7 @@ from rest_framework.response import Response
 from rest_framework import status,permissions
 # Serializers define the API representation.
 from.serializers import UserQustupdateSerializer, UserSerializer
-
+from rest_framework.views import APIView
 class CustomRedirect(HttpResponsePermanentRedirect):
 
     allowed_schemes = [os.environ.get('APP_SCHEME'), 'http', 'https']
@@ -189,3 +192,50 @@ class LogoutAPIView(generics.GenericAPIView):
         serializer.save()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class ListUsers(APIView):
+
+    def post(self, request, format=None):
+        """
+        Return a list of all users.
+        """
+        usernames = [user.username for user in User.objects.all()]
+        return Response(usernames)
+
+
+class UserOtpViewSet(viewsets.ViewSet):
+    
+    @action(detail=True, methods=["POST"])
+    def verify_otps(self, request, pk=None):
+        instance = request.user
+        v=verfiy_otp(pk)
+        
+        print(v)
+        print(instance)
+        if (
+            not instance.is_phoneverified
+            and v['status']==200
+            ):
+            instance.is_phoneverified = True
+            instance.save()
+            return Response(
+                "Successfully verified the user.", status=status.HTTP_200_OK
+            )
+        return Response(
+            "User active or Please enter the correct OTP.",
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    @action(detail=True, methods=["POST"])
+    def regenerate_otp(self, request, pk=None):
+        """
+        Regenerate OTP for the given user and send it to the user.
+        """
+        instance =request.user
+        v=send_otp(instance.phone_number)
+        if v["status"]== 400:
+            return Response(
+            "Faild To send.",
+            status=status.HTTP_400_BAD_REQUEST,)
+        else:
+            return Response("Successfully generate new OTP.", status=status.HTTP_200_OK)

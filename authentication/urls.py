@@ -1,9 +1,11 @@
 from django.urls import path
-from .views import RegisterView, LogoutAPIView,UserViewSet,UserUpdate,UserProfileUpdate, SetNewPasswordAPIView, VerifyEmail, LoginAPIView, PasswordTokenCheckAPI, RequestPasswordResetEmail
+from .views import RegisterView,UserOtpViewSet, LogoutAPIView,UserViewSet,UserUpdate,UserProfileUpdate, SetNewPasswordAPIView, VerifyEmail, LoginAPIView, PasswordTokenCheckAPI, RequestPasswordResetEmail
 from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
-
+from rest_framework.routers import DefaultRouter
+router = DefaultRouter()
+router.register("userotp", UserOtpViewSet, basename="userotp")
 
 urlpatterns = [
     path('register/', RegisterView.as_view(), name="register"),
@@ -21,3 +23,4 @@ path('userdetail/',UserViewSet.as_view(),name='user_detail'),
     path('user/profile/update/<int:id>',UserProfileUpdate.as_view(),name='user_pudate'),
     path('user/data/update/<int:id>',UserUpdate.as_view(),name='user_update'),
 ]
+urlpatterns += router.urls

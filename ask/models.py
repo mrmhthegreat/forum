@@ -51,7 +51,7 @@ class Post(models.Model):
     slug=models.SlugField(blank=True,null=True,unique=True)
     topics = models.ManyToManyField(Topic,related_name='posttopic', blank=False)
     content =RichTextUploadingField(blank=False,null=False, config_name='special')
-    image = models.ImageField( upload_to='post',null=False,blank=False)
+    image = models.FileField( upload_to='post',null=False,blank=False)
     tag = TaggableManager()
     author = models.ForeignKey(User,related_name='author',null=False,blank=False, on_delete = models.CASCADE)
     voter=models.ManyToManyField(PostVoter,blank=True)
@@ -63,7 +63,6 @@ class Post(models.Model):
     date_posted = models.DateTimeField(default=timezone.now)
     class Meta:
         ordering = ['-date_posted']
-
     def __str__(self):
         return self.question
     def get_absolute_url(self):

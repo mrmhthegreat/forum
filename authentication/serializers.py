@@ -9,6 +9,7 @@ from django.utils.encoding import smart_str, force_str, smart_bytes, DjangoUnico
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 
 
+    
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         max_length=68, min_length=6, write_only=True)
@@ -18,7 +19,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['email', 'username', 'password','first_name','last_name','image']
+        fields = ['email', 'username','phone_number', 'password','first_name','last_name','image']
 
     def validate(self, attrs):
         email = attrs.get('email', '')
@@ -36,18 +37,18 @@ class UserSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = [ 'first_name','username', 'last_name', 'email','is_active','type', 'image', 'is_verified','token','i_question','i_answer']
+        fields = [ 'first_name','username','phone_number', 'last_name', 'email','is_active','type','is_emailverified','is_phoneverified', 'image', 'is_verified','token','i_question','i_answer']
 
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['first_name','username', 'last_name', 'email','is_active','type', 'image', 'is_verified','token','i_question','i_answer']
+        fields = ['first_name','username', 'last_name', 'email','type', 'image', 'token','i_question','i_answer']
 
 
 class UserQustupdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = [ 'i_question','i_answer']
+        fields = [ 'i_question','i_answer',]
 
 class EmailVerificationSerializer(serializers.ModelSerializer):
     token = serializers.CharField(max_length=555)
