@@ -43,7 +43,9 @@ class PostManger(models.Manager):
         return self.get_querry().search(query,user=user,active=active)
 class PostVoter(models.Model):
     author = models.ForeignKey(User,blank=False,null=False, on_delete = models.CASCADE)
-
+    def __str__(self):
+        return self.author.email
+    
 
 class Post(models.Model):
     objects=PostManger()
@@ -54,7 +56,8 @@ class Post(models.Model):
     image = models.FileField( upload_to='post',null=False,blank=False)
     tag = TaggableManager()
     author = models.ForeignKey(User,related_name='author',null=False,blank=False, on_delete = models.CASCADE)
-    voter=models.ManyToManyField(PostVoter,blank=True)
+    voter_down=models.ManyToManyField(PostVoter,related_name='voter_down',blank=True)
+    voter_up=models.ManyToManyField(PostVoter,related_name='voter_up',blank=True)
     upvote=models.PositiveIntegerField(default=0)
     downvote=models.PositiveIntegerField(default=0)
     total_answer=models.PositiveIntegerField(default=0)
@@ -80,7 +83,8 @@ class Answer(models.Model):
     date_posted = models.DateTimeField(auto_now_add=True)
     upvote=models.PositiveIntegerField(default=0)
     downvote=models.PositiveIntegerField(default=0)
-    voter=models.ManyToManyField(PostVoter,blank=True)
+    voter_down=models.ManyToManyField(PostVoter,related_name='anwewr_voter_down',blank=True)
+    voter_up=models.ManyToManyField(PostVoter,related_name='anwewr_voter_up',blank=True)
     total_reply=models.PositiveIntegerField(default=0)
     is_anonymous = models.BooleanField(default=False)
     pin_answer = models.BooleanField(default=False)
@@ -96,8 +100,9 @@ class Answer_Reply(models.Model):
     upvote=models.PositiveIntegerField(default=0)
     downvote=models.PositiveIntegerField(default=0)
     date_posted = models.DateTimeField(default=timezone.now)
-    voter=models.ManyToManyField(PostVoter,blank=True)
-
+    voter_down=models.ManyToManyField(PostVoter,related_name='ranwewr_voter_down',blank=True)
+    voter_up=models.ManyToManyField(PostVoter,related_name='ranwewr_voter_up',blank=True)
+   
     class Meta:
         ordering = ['-date_posted']
     def __str__(self):

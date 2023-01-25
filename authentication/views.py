@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework import generics, status,views, permissions,viewsets
 from rest_framework.decorators import action
 from .serializers import RegisterSerializer, SetNewPasswordSerializer, ResetPasswordEmailRequestSerializer, EmailVerificationSerializer, LoginSerializer, LogoutSerializer, UserUpdateSerializer
-from rest_framework.response import Response
+
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User
 from .utils import Util
@@ -34,11 +34,12 @@ class CustomRedirect(HttpResponsePermanentRedirect):
 
     allowed_schemes = [os.environ.get('APP_SCHEME'), 'http', 'https']
 
-class UserViewSet(generics.RetrieveAPIView):
+class UserViewSet(generics.GenericAPIView):
     serializer_class=UserSerializer
-    permission_classes=[owner,permissions.IsAuthenticated]
-    def get_queryset(self,*args,**kwargs):
-        return User.objects.filter(author=self.request.user)
+    permission_classes=[owner]
+    def get(self, request):
+        serializer = self.serializer_class(data=User.objects.get(email=request.user.email))
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class UserUpdate(generics.UpdateAPIView):
     serializer_class=UserQustupdateSerializer
@@ -60,8 +61,9 @@ class RegisterView(generics.GenericAPIView):
 
     serializer_class = RegisterSerializer
     renderer_classes = (UserRenderer,)
-
+    
     def post(self, request):
+      
         user = request.data
         serializer = self.serializer_class(data=user)
         serializer.is_valid(raise_exception=True)
@@ -95,6 +97,7 @@ class VerifyEmail(views.APIView):
             user = User.objects.get(id=payload['user_id'])
             if not user.is_verified:
                 user.is_verified = True
+                user.is_emailverified=True
                 user.save()
             return Response({'email': 'Successfully activated'}, status=status.HTTP_200_OK)
         except jwt.ExpiredSignatureError as identifier:
@@ -105,7 +108,6 @@ class VerifyEmail(views.APIView):
 
 class LoginAPIView(generics.GenericAPIView):
     serializer_class = LoginSerializer
-
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -219,7 +221,7 @@ class UserOtpViewSet(viewsets.ViewSet):
             instance.is_phoneverified = True
             instance.save()
             return Response(
-                "Successfully verified the user.", status=status.HTTP_200_OK
+                v, status=status.HTTP_200_OK
             )
         return Response(
             "User active or Please enter the correct OTP.",
@@ -238,4 +240,4 @@ class UserOtpViewSet(viewsets.ViewSet):
             "Faild To send.",
             status=status.HTTP_400_BAD_REQUEST,)
         else:
-            return Response("Successfully generate new OTP.", status=status.HTTP_200_OK)
+            return Response(v, status=status.HTTP_200_OK)

@@ -42,7 +42,7 @@ class UserSerializer(serializers.ModelSerializer):
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['first_name','username', 'last_name', 'email','type', 'image', 'token','i_question','i_answer']
+        fields = ['first_name','username', 'last_name', 'type', 'image', 'token','i_question','i_answer']
 
 
 class UserQustupdateSerializer(serializers.ModelSerializer):
@@ -95,6 +95,8 @@ class LoginSerializer(serializers.ModelSerializer):
             raise AuthenticationFailed('Account disabled, contact admin')
         if not user.is_verified:
             raise AuthenticationFailed('Email is not verified')
+        if not user.is_phoneverified:
+            raise AuthenticationFailed('Phone Number is not verified')
 
         return {
             'email': user.email,

@@ -3,6 +3,10 @@ from django.db.models.signals import pre_save,post_save
 import random
 from datetime import datetime, timedelta
 # Create your models here.
+from django.urls import reverse
+
+from rest_framework_simplejwt.tokens import RefreshToken
+from .utils import Util
 from django.contrib.auth.models import (
     AbstractBaseUser, BaseUserManager, PermissionsMixin)
 from django.conf import settings
@@ -10,15 +14,16 @@ from django.db import models
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.core.validators import RegexValidator, validate_email
 from .utils import send_otp
+from django.contrib.sites.shortcuts import get_current_site
+
 class UserManager(BaseUserManager):
 
-    def create_user(self, username, email, password=None):
+    def create_user(self, username, email,phone_number,first_name,last_name,password=None):
         if username is None:
             raise TypeError('Users should have a username')
         if email is None:
             raise TypeError('Users should have a Email')
-
-        user = self.model(username=username, email=self.normalize_email(email))
+        user = self.model(username=username,last_name=last_name,phone_number=phone_number,first_name =first_name,email=self.normalize_email(email))
         user.set_password(password)
         user.save()
         return user
@@ -46,8 +51,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=255, unique=True, db_index=True)
     first_name = models.CharField(max_length=255, null=True,blank=True)
     last_name = models.CharField(max_length=255, null=True,blank=True)
-    phone_number = models.CharField(
-        unique=True,default='+923175041207' ,max_length=10,null=False, blank=False, validators=[phone_regex])
+    phone_number = models.CharField( unique=True,
+        default='+923175041207' ,max_length=13,null=False, blank=False, )
     is_verified = models.BooleanField(default=False)
     is_emailverified = models.BooleanField(default=False)
     is_phoneverified = models.BooleanField(default=False)
@@ -89,5 +94,15 @@ class Notification(models.Model):
 def post_pre_save(sender,instance,created,*arg,**kwargs):
     if created:
         send_otp(instance.phone_number)
+        user = instance
+        token = RefreshToken.for_user(user).access_token
+        relativeLink = reverse('email-verify')
+        absurl = 'http://127.0.0.1:8000/'+relativeLink+"?token="+str(token)
+        email_body = 'Hi '+user.username + \
+            ' Use the link below to verify your email \n' + absurl
+        data = {'email_body': email_body, 'to_email': user.email,
+                'email_subject': 'Verify your email'}
+
+        Util.send_email(data)
 post_save.connect(post_pre_save,sender=User)
 

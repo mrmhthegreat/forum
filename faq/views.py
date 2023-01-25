@@ -1,14 +1,16 @@
 from rest_framework import generics
-from.serlizer import FaqSerlizer
+from.serlizer import FaqSerlizer,FAQTopicSerialzer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 # Serializers define the API representation.
 from .models import FaqTopic,FAQ
-
+FAQTopicSerialzer
 class AllFaqList(generics.ListAPIView):
     serializer_class=FaqSerlizer
     queryset=FAQ.objects.all()
-  
+class AllFaqTopiList(generics.ListAPIView):
+    serializer_class=FAQTopicSerialzer
+    queryset=FaqTopic.objects.all()
 class FilterFaqList(generics.ListAPIView):
     serializer_class=FaqSerlizer
     queryset=FAQ.objects.all()

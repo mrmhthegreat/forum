@@ -193,7 +193,6 @@ REST_FRAMEWORK = {
     # or allow read-only access for unauthenticated users.
     
     'NON_FIELD_ERRORS_KEY': 'error',
-
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.BasicAuthentication',
@@ -232,10 +231,10 @@ SWAGGER_SETTINGS = {
     },
 }
 
-EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_HOST = 'smtp.zoho.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'apikey' # Name for all the SenGrid accounts
-EMAIL_HOST_PASSWORD = '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'
-DEFAULT_FROM_EMAIL = 'noreply@gmail.com'
+EMAIL_HOST_USER = 'forumcom@zohomail.com' # Name for all the SenGrid accounts
+EMAIL_HOST_PASSWORD = 'Malikmd0064@#'
+DEFAULT_FROM_EMAIL = 'forumcom@zohomail.com'
 LOGIN_REDIRECT_URL = 'success'

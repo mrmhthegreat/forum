@@ -9,34 +9,42 @@ class TagSerialzer(serializers.Serializer):
 
 class TopicSerialzer(serializers.Serializer):
     topic=serializers.CharField(read_only=True)
+    image=serializers.CharField(read_only=True)
+
     id=serializers.IntegerField(read_only=True)
     
-class VoteSerialzer(serializers.Serializer):
-    username=serializers.CharField(read_only=True)
+class VoteSerialzer(serializers.ModelSerializer):
+    email=serializers.SerializerMethodField(read_only=True)
+    class Meta:
+        model=PostVoter
+        fields=['email']
+    def get_email(self,obj):
+        return obj.author.email
 class AnswereplySerialzer(serializers.ModelSerializer):
     author=UserSerializer()
-    voter=VoteSerialzer(many=True)
+    voter_up=VoteSerialzer(many=True)
+    voter_down=VoteSerialzer(many=True)
     class Meta:
         model=Answer_Reply
-        fields=['id','author','upvote','downvote','date_posted','reply','voter']
+        fields=['id','author','upvote','downvote','date_posted','reply','voter_up','voter_down']
         
-
 class AnswerSerialzer(serializers.ModelSerializer):
     author=UserSerializer()
     reply=AnswereplySerialzer(many=True)
-    voter=VoteSerialzer(many=True)
-
+   
+    voter_up=VoteSerialzer(many=True)
+    voter_down=VoteSerialzer(many=True)
     class Meta:
         model=Answer
-        fields=['id','author','answer','reply','upvote','downvote','date_posted','total_reply','is_anonymous','pin_answer','voter']
+        fields=['id','author','answer','reply','upvote','downvote','date_posted','total_reply','is_anonymous','pin_answer','voter_up','voter_down']
 
 class PostSelizer(serializers.ModelSerializer):
     url=serializers.HyperlinkedIdentityField(view_name='post_detail',lookup_field='slug')
     editurl=serializers.HyperlinkedIdentityField(view_name='post_update',lookup_field='slug')
     answer_url=serializers.SerializerMethodField(read_only=True)
-    tag=TagSerialzer()
     topics=TopicSerialzer(many=True)
-    voter=VoteSerialzer(many=True)
+    voter_up=VoteSerialzer(many=True)
+    voter_down=VoteSerialzer(many=True)
     def get_answer_url(self,obj):
         return 'http://127.0.0.1:8000'+'/api/v1/postdata/post/answerlist/'+f"?slug={obj.slug}"
     # getmy-d(sle,d):
@@ -48,7 +56,7 @@ class PostSelizer(serializers.ModelSerializer):
     author=UserSerializer()
     class Meta:
         model=Post
-        fields=['id','url','editurl','answer_url','question','topics','content','image','tag','author','upvote','downvote','total_answer','is_active','is_anonymous','date_posted','voter']
+        fields=['id','url','editurl','answer_url','question','topics','content','image','author','upvote','downvote','total_answer','is_active','is_anonymous','date_posted','voter_up','voter_down']
 
 
 
@@ -62,11 +70,12 @@ class PostDetailSelizer(serializers.ModelSerializer):
     
     tag=TagSerialzer()
     topics=TopicSerialzer(many=True)
-    voter=VoteSerialzer(many=True)
+    voter_up=VoteSerialzer(many=True)
+    voter_down=VoteSerialzer(many=True)
     
     class Meta:
         model=Post
-        fields=['id','question','topics','content','image','tag','author','upvote','downvote','total_answer','is_active','is_anonymous','date_posted','voter']
+        fields=['id','question','topics','content','image','tag','author','upvote','downvote','total_answer','is_active','is_anonymous','date_posted','voter_up','voter_down']
      
     # def get_discount(self,obj):
     #     return ''
@@ -98,32 +107,24 @@ class PostUpdateSelizer(serializers.ModelSerializer):
         model=Post
         fields=['question','topics','content','image','is_active',]
 
-
-
 class PostCountSelizer(serializers.ModelSerializer):
-    post=serializers.IntegerField(write_only=True)
     class Meta:
         model=Post
-        fields=['post','upvote','downvote','total_answer','is_active']
+        fields=['upvote','downvote','total_answer','is_active']
 class AnswerCountSelizer(serializers.ModelSerializer):
-    id=serializers.IntegerField(write_only=True)
     class Meta:
         model=Answer
-        fields=['upvote','downvote','total_reply','pin_answer','id']
+        fields=['upvote','downvote','total_reply','pin_answer']
 class AnswerRCountSelizer(serializers.ModelSerializer):
-    id=serializers.IntegerField(write_only=True)
     class Meta:
         model=Answer_Reply
-        fields=['upvote','downvote','id']
+        fields=['upvote','downvote']
 
 class AnswetCreateSelizer(serializers.ModelSerializer):
-    post=serializers.IntegerField(write_only=True)
     class Meta:
         model=Answer
-
-        fields=['answer','is_anonymous','post']
+        fields=['answer','is_anonymous']
 class AnsweReplyCreatSelizer(serializers.ModelSerializer):
-    anser=serializers.IntegerField(write_only=True)
     class Meta:
         model=Answer_Reply
-        fields=['reply','anser']
+        fields=['reply']

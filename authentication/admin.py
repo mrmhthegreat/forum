@@ -6,6 +6,8 @@ from .models import User,Notification
 admin.site.site_header = 'Descussion Froum'
 class UserAdmin(admin.ModelAdmin):
     list_display = ['username', 'email', 'auth_provider', 'created_at']
+    readonly_fields = ["password"]
+
 admin.site.register(User, UserAdmin)
 @admin.register(Notification)
 class notifcation_admin(admin.ModelAdmin):
